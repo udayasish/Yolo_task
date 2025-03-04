@@ -1,7 +1,3 @@
-Here’s a well-structured `README.md` file for your project. It includes instructions for setting up and running both the frontend (Next.js) and backend (NestJS) separately.
-
----
-
 # YOLO Task - Fullstack Application
 
 This is a fullstack application built with **Next.js (React + TypeScript)** for the frontend and **NestJS** for the backend. The application includes user authentication, profile management, and input validations using **Zod** on the backend.
