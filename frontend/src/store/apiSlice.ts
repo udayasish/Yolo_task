@@ -51,7 +51,8 @@ interface UpdateProfileRequest {
 
 export const apiSlice = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:3000/", credentials: 'include',  }),
+  // baseQuery: fetchBaseQuery({ baseUrl: "http://localhost:3000/", credentials: 'include',  }),
+  baseQuery: fetchBaseQuery({ baseUrl: "https://yolo-task.onrender.com/", credentials: 'include',  }),
   endpoints: (builder) => ({
     signup: builder.mutation<void, SignupRequest>({
       query: (userData) => ({
