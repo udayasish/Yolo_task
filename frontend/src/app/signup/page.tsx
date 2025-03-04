@@ -1,4 +1,3 @@
-// app/signup/page.tsx
 "use client"; // Mark as a Client Component
 
 import { useForm } from "react-hook-form";
@@ -6,12 +5,11 @@ import { useSignupMutation } from "@/store/apiSlice";
 import { useRouter } from "next/navigation"; // Updated import
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; // Import the styles
 import { format } from "date-fns";
 import {
   Select,
@@ -42,6 +40,7 @@ export default function Signup() {
   const [signup, { isLoading }] = useSignupMutation();
   const router = useRouter(); // Correct usage
   const isAuthenticated = useSelector((state: RootState) => state.auth.status);
+  const [birthDate, setBirthDate] = useState<Date | null>(null);
 
   useEffect(() => {
     if (isAuthenticated) router.push("/edit-profile");
@@ -50,11 +49,9 @@ export default function Signup() {
   const onSubmit = async (data: SignupFormData) => {
     try {
       // Format the date as a string before sending to the backend
-      console.log("Raw data: ", data);
-
       const formattedData = {
         ...data,
-        birthDate: format(new Date(data.birthDate), "yyyy-MM-dd"), // Format as string
+        birthDate: birthDate ? format(birthDate, "yyyy-MM-dd") : "", // Format as string
       };
       await signup(formattedData).unwrap();
       router.push("/edit-profile");
@@ -111,21 +108,25 @@ export default function Signup() {
             <p className="text-red-500 text-sm">{errors.name.message}</p>
           )}
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full">
-                {watch("birthDate") ? format(new Date(watch("birthDate")), "PPP") : "Pick a date"}
-                <CalendarIcon className="ml-2" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="start">
-              <Calendar
-                mode="single"
-                selected={watch("birthDate") ? new Date(watch("birthDate")) : undefined}
-                onSelect={(date) => setValue("birthDate", date ? date.toISOString() : "")}
-              />
-            </PopoverContent>
-          </Popover>
+          {/* Date Picker */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Birth Date</label>
+            <DatePicker
+              selected={birthDate}
+              onChange={(date: Date | null) => {
+                setBirthDate(date);
+                if (date) {
+                  setValue("birthDate", date.toISOString());
+                }
+              }}
+              dateFormat="yyyy-MM-dd"
+              placeholderText="Pick a date"
+              className="w-full p-2 border rounded-md"
+            />
+            {errors.birthDate && (
+              <p className="text-red-500 text-sm">{errors.birthDate.message}</p>
+            )}
+          </div>
 
           {/* Gender Select Dropdown */}
           <div>

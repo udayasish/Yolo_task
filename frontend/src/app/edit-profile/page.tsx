@@ -5,13 +5,11 @@ import { useGetProfileQuery, useUpdateProfileMutation } from "@/store/apiSlice";
 import { useRouter } from "next/navigation"; // Updated import
 import { useSelector } from "react-redux";
 import { RootState } from "@/store/store"; // Import RootState
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Calendar } from "@/components/ui/calendar";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { CalendarIcon } from "lucide-react";
-import { format } from "date-fns";
+import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css"; // Import the styles
 import {
   Select,
   SelectContent,
@@ -47,6 +45,9 @@ export default function EditProfile() {
   const router = useRouter(); // Correct usage
   const isAuthenticated = useSelector((state: RootState) => state.auth.status);
 
+  // State for birthDate
+  const [birthDate, setBirthDate] = useState<Date | null>(null);
+
   // Redirect to login if not authenticated
   useEffect(() => {
     if (!isAuthenticated) router.push("/login");
@@ -61,6 +62,11 @@ export default function EditProfile() {
       setValue("birthDate", profile.birthDate);
       setValue("gender", profile.gender);
       setValue("description", profile.description);
+
+      // Set the birthDate state if profile.birthDate exists
+      if (profile.birthDate) {
+        setBirthDate(new Date(profile.birthDate));
+      }
     }
   }, [profile, setValue]);
 
@@ -120,22 +126,27 @@ export default function EditProfile() {
             <p className="text-red-500 text-sm">{errors.name.message}</p>
           )}
 
-          <Popover>
-            <PopoverTrigger asChild>
-              <Button variant="outline" className="w-full">
-                {watch("birthDate") ? format(new Date(watch("birthDate")), "PPP") : "Pick a date"}
-                <CalendarIcon className="ml-2" />
-              </Button>
-            </PopoverTrigger>
-            <PopoverContent align="start">
-              <Calendar
-                mode="single"
-                selected={watch("birthDate") ? new Date(watch("birthDate")) : undefined}
-                onSelect={(date) => setValue("birthDate", date ? date.toISOString() : "")}
-              />
-            </PopoverContent>
-          </Popover>
+          {/* Date Picker */}
+          <div>
+            <label className="block text-sm font-medium mb-1">Birth Date</label>
+            <DatePicker
+              selected={birthDate}
+              onChange={(date: Date | null) => {
+                setBirthDate(date);
+                if (date) {
+                  setValue("birthDate", date.toISOString());
+                }
+              }}
+              dateFormat="yyyy-MM-dd"
+              placeholderText="Pick a date"
+              className="w-full p-2 border rounded-md"
+            />
+            {errors.birthDate && (
+              <p className="text-red-500 text-sm">{errors.birthDate.message}</p>
+            )}
+          </div>
 
+          {/* Gender Select Dropdown */}
           <div>
             <label className="block text-sm font-medium mb-1">Gender</label>
             <Select
