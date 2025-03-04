@@ -7,7 +7,8 @@ async function bootstrap() {
   const app = await NestFactory.create(AppModule);
   app.use(cookieParser()); 
   app.enableCors({
-    origin: 'http://localhost:3001', // Allow requests from your frontend
+    // origin: 'http://localhost:3001', // Allow requests from your frontend
+    origin: 'https://yolo-task-vsei.vercel.app', // Allow requests from your frontend
     methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
     credentials: true,
   });
